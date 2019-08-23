@@ -1,0 +1,8 @@
+usr/bin
+usr/lib/osso-mahjong/osso_mahjong_plugin.so
+usr/share/applications
+usr/share/osso-mahjong/osso_mahjong.conf
+usr/share/dbus-1
+etc/osso-cud-scripts
+etc/osso-backup
+usr/share/osso-mahjong

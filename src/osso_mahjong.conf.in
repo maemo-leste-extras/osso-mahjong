@@ -1,0 +1,13 @@
+# Mahjong config file
+
+[Startup Entry]
+Name=osso_mahjong
+Version=@VERSION@
+Title=Mahjong
+TitleId=game_ap_mahjong_name
+GettextPackage=osso-games
+PluginPath=@prefix@/lib/osso-mahjong/osso_mahjong_plugin.so
+Image=@datadir@/pixmaps/osso-games-startup-mahjong.png 
+ServiceName=com.nokia.osso_mahjong
+PathName=/com/nokia/osso_mahjong
+InterfaceName=com.nokia.osso_mahjong
