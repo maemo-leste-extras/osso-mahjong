@@ -31,7 +31,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <hildon/hildon-caption.h>
 #include <hildon/hildon-banner.h>
-#include <libgnomevfs/gnome-vfs.h>
+#include <gio/gio.h>
 #include <startup_plugin.h>
 
 #define OSSO_MAHJONG_HELP_PATH "Applications_mahjong_startupview"
@@ -200,8 +200,6 @@ load_plugin(void)
     GtkWidget *sound_label;
     GtkWidget *alignment;
     
-    gnome_vfs_init();
-
     gcc = gconf_client_get_default();
     sound = plugin_settings_get_bool_fallback(SETTINGS_SOUND, TRUE);
     board = gconf_client_get_int(gcc, SETTINGS_DIFFICULTY, NULL);
@@ -847,40 +845,48 @@ plugin_highscore_read_file(void)
     /* Test if file exists */
     if (g_file_test(file, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR))
     {
-        GnomeVFSHandle *handle;
+        GFile *handle;
+        GFileInputStream *istream;
+        GError *err = NULL;
 
-        /* Try to open the file */
-        if (gnome_vfs_open(&handle, file, GNOME_VFS_OPEN_READ) ==
-            GNOME_VFS_OK)
+        g_file_new_for_path (file);
+        istream = g_file_read (handle, NULL, &err);
+
+        if (err != NULL)
         {
-
-            static const GnomeVFSFileSize DATA_BUFFER_SIZE = 1024;
-            GnomeVFSFileSize cnt;
-            GnomeVFSResult res;
-            gchar data[DATA_BUFFER_SIZE + 1];
-            GString *scores = g_string_new("");
-
-            /* Read file contents */
-            do
-            {
-                res = gnome_vfs_read(handle, (gpointer) data,
-                                     DATA_BUFFER_SIZE, &cnt);
-
-                if (cnt > 0)
-                {
-                    g_assert(cnt <= DATA_BUFFER_SIZE);
-
-                    data[cnt] = 0;
-                    g_string_append(scores, data);
-                }
-            } while (res == GNOME_VFS_OK && cnt > 0);
-
-            gnome_vfs_close(handle);
-
-            return scores;
+            g_error ("Could not open %s for reading: %s\n", file, err->message);
+            g_error_free (err);
+            return NULL;
         }
-    }
 
+        static const guint64 DATA_BUFFER_SIZE = 1024;
+        gboolean  success;
+        gchar buffer[DATA_BUFFER_SIZE + 1];
+        gsize bytes_read;
+        GString *scores = g_string_new("");
+
+        success = g_input_stream_read_all (istream, buffer, sizeof (buffer), &bytes_read, NULL, &err);
+
+        //Might need \0 added first
+        if (bytes_read > 0)
+          g_string_append_len (scores, buffer, bytes_read);
+
+        if (!success)
+	{
+	    if (scores->len > 0)
+            {
+	        g_printerr ("%s: read error in '%s', trying to scan "
+	                         "partial content: %s",
+	                          G_STRFUNC, file, err->message);
+	        g_clear_error (&err);
+            }
+        }
+
+        g_object_unref(handle);
+        g_object_unref(istream);
+
+        return scores;
+    }
     return NULL;
 }
 

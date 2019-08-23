@@ -27,7 +27,7 @@
 #include <glib/gstdio.h>
 
 #include <string.h>
-#include <libgnomevfs/gnome-vfs.h>
+#include <gio/gio.h>
 #include <libintl.h>
 
 #include <hildon/hildon-banner.h>
@@ -42,38 +42,42 @@ hiscore_get(HiScore ** scores)
     if (!filename)
         return 0;
 
-    if (!gnome_vfs_initialized())
-        gnome_vfs_init();
-
-    GnomeVFSHandle *handle;
+    GFile *handle;
+    GFileInputStream *istream;
+    GError *err = NULL;
     GString *scorestr = g_string_new("");
 
-    /* Try to open the file */
-    if (gnome_vfs_open(&handle, filename, GNOME_VFS_OPEN_READ) ==
-        GNOME_VFS_OK)
+    handle = g_file_new_for_path (filename);
+    istream = g_file_read (handle, NULL, &err);
+
+    if (err != NULL)
     {
+        g_error ("Could not open %s for reading: %s\n", filename, err->message);
+        g_error_free (err);
+    }
+    else
+    {
+        static const guint64 DATA_BUFFER_SIZE = 1024;
+        gboolean  success;
+        gchar buffer[DATA_BUFFER_SIZE + 1];
+        gsize bytes_read;
+        
+        success = g_input_stream_read_all (G_INPUT_STREAM(istream), buffer, sizeof (buffer), &bytes_read, NULL, &err);
 
-        static const GnomeVFSFileSize DATA_BUFFER_SIZE = 1024;
-        GnomeVFSFileSize cnt;
-        GnomeVFSResult res = 0;
-        gchar data[DATA_BUFFER_SIZE + 1];
+        //Might need \0 added first
+        if (bytes_read > 0)
+          g_string_append_len (scorestr, buffer, bytes_read);
 
-        /* Read file contents */
-        do
-        {
-            res = gnome_vfs_read(handle, (gpointer) data,
-                                 DATA_BUFFER_SIZE, &cnt);
-
-            if (cnt > 0)
+        if (!success)
+	{
+	    if (scorestr->len > 0)
             {
-                g_assert(cnt <= DATA_BUFFER_SIZE);
-
-                data[cnt] = 0;
-                g_string_append(scorestr, data);
+	        g_printerr ("%s: read error in '%s', trying to scan "
+	                         "partial content: %s",
+	                          G_STRFUNC, filename, err->message);
+	        g_clear_error (&err);
             }
-        } while (res == GNOME_VFS_OK && cnt > 0);
-
-        gnome_vfs_close(handle);
+        }
     }
 
     char this_level;
@@ -126,6 +130,9 @@ hiscore_get(HiScore ** scores)
 
     g_free(filename);
     g_string_free(scorestr, 1);
+    g_input_stream_close(G_INPUT_STREAM(istream),NULL,NULL);
+    g_object_unref(istream);
+    g_object_unref (G_OBJECT (handle));
 
     return count;
 }
@@ -206,58 +213,55 @@ hiscore_put(HiScore * scores, int count, AppData * app_data)
     if (!filename)
         return;
 
-    if (!gnome_vfs_initialized())
-        gnome_vfs_init();
-
-    GnomeVFSHandle *handle;
-    GnomeVFSResult file_method_result;
+    GFile *handle;
+    GFileOutputStream *ostream;
+    GError *err = NULL;
     GString *scorestr = g_string_new("");
 
-    file_method_result =
-        gnome_vfs_create(&handle, filename_temp, GNOME_VFS_OPEN_WRITE, FALSE,
-                         0644);
+    handle = g_file_new_for_path (filename_temp);
+    ostream = g_file_replace (handle, NULL, FALSE, G_FILE_CREATE_NONE, NULL, &err);
 
-    /* Try to open the file */
-    if (file_method_result == GNOME_VFS_OK)
+    if (err != NULL)
     {
-
-        GnomeVFSFileSize cnt;
-        GnomeVFSResult res = GNOME_VFS_OK;
-
-        /* Write file contents */
+        //TODO: Add Maemo storage full notification if needed.
+        //if (file_method_result == GNOME_VFS_ERROR_NO_SPACE)
+        //{
+        //    hildon_banner_show_information(GTK_WIDGET
+        //        (app_data->app_ui_data->window),
+        //        NULL, dgettext("ke-recv", "cerm_device_memory_full"));
+        //}
+        g_error ("Could not open %s for writing: %s\n", filename_temp, err->message);
+        g_error_free (err);
+    }
+    else
+    {
+        gsize cnt;
+        gboolean  success;
+       /* Write file contents */
         for (i = 0; i < count; i++)
         {
             g_string_printf(scorestr, "%d %ld %c\n", scores[i].score,
                             (unsigned long) scores[i].date, scores[i].level);
-            res =
-                gnome_vfs_write(handle, (gpointer) scorestr->str,
-                                scorestr->len, &cnt);
-            if (res != GNOME_VFS_OK)
+            success = g_output_stream_write_all (G_OUTPUT_STREAM(ostream), (gpointer) scorestr->str, scorestr->len, &cnt, NULL, NULL);
+            if (!success)
             {
                 break;
             }
         }
-        if (res != GNOME_VFS_OK)
+        if (!success)
         {
             hildon_banner_show_information(
                 GTK_WIDGET(app_data->app_ui_data->window),
                 NULL, dgettext("ke-recv", "cerm_device_memory_full"));
         }
-
-        gnome_vfs_close(handle);
-        if (res == GNOME_VFS_OK) {
+	g_output_stream_close(G_OUTPUT_STREAM(ostream),NULL,NULL);
+	g_object_unref(ostream);
+        g_object_unref (G_OBJECT (handle));
+        if (success) {
             g_unlink(filename);
             g_rename(filename_temp,filename);
         }
-    }
-    else
-    {
-        if (file_method_result == GNOME_VFS_ERROR_NO_SPACE)
-        {
-            hildon_banner_show_information(GTK_WIDGET
-                (app_data->app_ui_data->window),
-                NULL, dgettext("ke-recv", "cerm_device_memory_full"));
-        }
+
     }
 
     if (filename != NULL) {

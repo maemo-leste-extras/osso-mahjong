@@ -1,6 +1,6 @@
 SUBDIRS = ui mahjong plugin
 INCLUDES = $(GTK_CFLAGS) $(OSSO_CFLAGS) $(GCONF_CFLAGS) $(PNG_CFLAGS) \
-	   $(PANGO_CFLAGS) $(ESOUND_CFLAGS) $(GNOMEVFS_CFLAGS)
+	   $(PANGO_CFLAGS) $(ESOUND_CFLAGS) $(CANBERRA_CFLAGS)
 
 servicefiledir=$(prefix)/share/dbus-1/services
 servicefile_DATA = com.nokia.osso_mahjong.service \
@@ -53,5 +53,5 @@ backupconfiguration_DATA=osso-mahjong.conf
 
 Mahjong_LDFLAGS = $(MAEMO_LAUNCHER_LDFLAGS)
 Mahjong_LDADD = $(GTK_LIBS) $(OSSO_LIBS) $(GCONF_LIBS) $(PNG_LIBS) \
-	$(PANGO_LIBS) $(ESOUND_LIBS) $(GNOMEVFS_LIBS) ui/libmahjongui.a \
+	$(PANGO_LIBS) $(ESOUND_LIBS) $(CANBERRA_LIBS) ui/libmahjongui.a \
        	mahjong/libmahjong.a
