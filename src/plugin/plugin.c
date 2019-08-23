@@ -849,7 +849,7 @@ plugin_highscore_read_file(void)
         GFileInputStream *istream;
         GError *err = NULL;
 
-        g_file_new_for_path (file);
+        handle = g_file_new_for_path (file);
         istream = g_file_read (handle, NULL, &err);
 
         if (err != NULL)
@@ -865,7 +865,7 @@ plugin_highscore_read_file(void)
         gsize bytes_read;
         GString *scores = g_string_new("");
 
-        success = g_input_stream_read_all (istream, buffer, sizeof (buffer), &bytes_read, NULL, &err);
+        success = g_input_stream_read_all (G_INPUT_STREAM(istream), buffer, sizeof (buffer), &bytes_read, NULL, &err);
 
         //Might need \0 added first
         if (bytes_read > 0)
