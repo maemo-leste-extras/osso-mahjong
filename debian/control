@@ -7,7 +7,7 @@ Standards-Version: 3.6.0
 
 Package: osso-mahjong
 Architecture: any
-Depends: osso-games-l10n-mr | osso-games-l10n-mr0, ${shlibs:Depends}, ${misc:Depends}, osso-games-startup (>=1.0.21),  osso-graphics-game-mahjong (>=1.0), osso-sounds-game-mahjong, ke-recv-l10n-mr | ke-recv-l10n-mr0,  hildon-libs-l10n-mr | hildon-libs-l10n-mr0, ${launcher:Depends}
+Depends: osso-games-l10n-mr | osso-games-l10n-mr0, ${shlibs:Depends}, ${misc:Depends}, osso-games-startup (>=1.0.21),  osso-graphics-game-mahjong (>=1.0) | libre-mahjong-graphics, osso-sounds-game-mahjong | libre-mahjong-sounds, ke-recv-l10n-mr | ke-recv-l10n-mr0,  hildon-libs-l10n-mr | hildon-libs-l10n-mr0, ${launcher:Depends}
 Description: OSSO Mahjong
  OSSO Mahjong game. Requires OSSO games Start-up, which is provided separately.
 
