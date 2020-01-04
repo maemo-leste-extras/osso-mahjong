@@ -1,3 +1,10 @@
+osso-mahjong (1.9.0) unstable; urgency=low
+
+  * Initial Leste import
+  * Some rendering bugs remain
+
+ -- Merlijn Wajer <merlijn@wizzup.org>  Sat, 04 Jan 2020 20:08:29 +0100
+
 osso-mahjong (1.8.03-2+0m5) unstable; urgency=low
 
   * This entry has been added by BIFH queue processor
