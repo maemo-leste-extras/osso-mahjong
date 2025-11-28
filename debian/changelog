@@ -1,3 +1,9 @@
+osso-mahjong (1.9.1) unstable; urgency=low
+
+  * Fix compilation
+
+ -- Merlijn Wajer <merlijn@wizzup.org>  Sat, 29 Nov 2025 00:23:45 +0100
+
 osso-mahjong (1.9.0) unstable; urgency=low
 
   * Initial Leste import
