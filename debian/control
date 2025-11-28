@@ -2,7 +2,7 @@ Source: osso-mahjong
 Section: user/games
 Priority: optional
 Maintainer: Maske Amish <amish.maske@nokia.com>
-Build-Depends:  intltool,libhildon1-dev, debhelper (>= 4.0.0), dbus (>= 0.22), libdbus-glib-1-2 (>= 0.22), libatk1.0-0 (>= 1.6.0), libc6 (>= 2.3), libgtk2.0-0 (>= 2.2), libgtk2.0-dev (>= 2.2), libgconf2-dev (>= 2.6), libpng16-16 (>= 1.6.0), libpng-dev (>= 1.6.0), libpango1.0-0 (>= 1.6.0), libglib2.0-dev (>= 2.2), libdbus-1-dev (>= 0.22), libdbus-glib-1-dev (>= 0.22), libosso-dev, osso-games-startup-dev, maemo-launcher-dev ,libcanberra-dev
+Build-Depends:  intltool,libhildon1-dev, debhelper (>= 4.0.0), dbus (>= 0.22), libdbus-glib-1-2 (>= 0.22), libatk1.0-0 (>= 1.6.0), libc6 (>= 2.3), libgtk2.0-dev (>= 2.2), libgconf2-dev (>= 2.6), libpng16-16 (>= 1.6.0), libpng-dev (>= 1.6.0), libpango1.0-dev, libglib2.0-dev (>= 2.2), libdbus-1-dev (>= 0.22), libdbus-glib-1-dev (>= 0.22), libosso-dev, osso-games-startup-dev, maemo-launcher-dev ,libcanberra-dev
 Standards-Version: 3.6.0
 XSB-Homepage: http://github.com/maemo-leste-extras/osso-mahjong
 XSBC-Bugtracker: http://github.com/maemo-leste-extras/osso-mahjong/issues
@@ -13,11 +13,3 @@ Depends: osso-games-l10n-mr | osso-games-l10n-mr0, ${shlibs:Depends}, ${misc:Dep
 Description: OSSO Mahjong
  OSSO Mahjong game. Requires OSSO games Start-up, which is provided separately.
 XB-Maemo-Display-Name: Mahjong
-
-Package: osso-mahjong-dbg
-Architecture: any
-Section: devel
-Depends: osso-mahjong ( = ${source:Version})
-Description: OSSO Mahjong debug symbols
- Debug symbols for OSSO Mahjong.
-
