@@ -52,6 +52,6 @@ backupconfiguration_DATA=osso-mahjong.conf
 
 
 Mahjong_LDFLAGS = $(MAEMO_LAUNCHER_LDFLAGS)
-Mahjong_LDADD = $(GTK_LIBS) $(OSSO_LIBS) $(GCONF_LIBS) $(PNG_LIBS) \
-	$(PANGO_LIBS) $(ESOUND_LIBS) $(CANBERRA_LIBS) ui/libmahjongui.a \
-       	mahjong/libmahjong.a
+Mahjong_LDADD = ui/libmahjongui.a mahjong/libmahjong.a \
+	$(GTK_LIBS) $(OSSO_LIBS) $(GCONF_LIBS) $(PNG_LIBS) \
+	$(PANGO_LIBS) $(ESOUND_LIBS) $(CANBERRA_LIBS)
